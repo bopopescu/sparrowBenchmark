@@ -1,0 +1,193 @@
+package edu.berkeley.sparrow.examples;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
+
+
+
+public class FrontendMessageProcessing implements Runnable{
+
+	private ConcurrentLinkedQueue<TimeMessage> fifo = new ConcurrentLinkedQueue<FrontendMessageProcessing.TimeMessage>();
+	private boolean run = true;
+	private long[] endTimes;
+	private Logger LOG;
+	private ServerSocket serverSocket;
+	private Thread[] receptionThreads = new Thread[124];
+	private String messageSeparator = ";";
+	private Pattern pattern1 = Pattern.compile(messageSeparator);
+	private String idEndTimeSeparator = ":";
+	private Pattern pattern2 = Pattern.compile(idEndTimeSeparator);
+	private ArrayList<Integer> taskIds = new ArrayList<Integer>();
+
+	public FrontendMessageProcessing(int numberOfTasks, Logger log, ServerSocket serverSocket) {
+		this.endTimes = new long[numberOfTasks];
+		this.LOG = log;
+		this.serverSocket = serverSocket;
+	}
+
+
+	private class TimeMessage{
+		private final long receptionTime;
+		private final String message;
+
+		public TimeMessage(long time, String message){
+			this.receptionTime = time;
+			this.message = message;
+		}
+
+	}
+
+	private class ConnectionHandler implements Runnable{
+		private int index = 0;
+		@Override
+		public void run() {
+			while(run){
+				LOG.debug("Connection Handler - waiting for connection");
+				try {
+					Socket socket = serverSocket.accept();
+					MessageHandler messageHandler = new MessageHandler(socket);
+					receptionThreads[index] = new Thread(messageHandler);
+					receptionThreads[index].start();	
+					LOG.debug("Connection Handler - connection made");
+					index ++;
+				} catch (SocketException e){
+					e.printStackTrace();
+					break;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+			}
+			LOG.debug("Connection Handler - exit");
+			run = false;
+
+		}
+	}
+
+	private class MessageHandler implements Runnable{
+		private Socket receptionSocket;
+		private MessageHandler(Socket socket){
+			this.receptionSocket = socket;
+		}
+		@Override
+		public void run() {
+			DataInputStream in;
+			LOG.debug("Message Handler - start");
+			try {
+				in = new DataInputStream(receptionSocket.getInputStream());
+				while(run){
+					if (in.available() > 0){
+						LOG.debug("Message Handler - available > 0");
+						String tasksCompletedBatch = in.readUTF();
+						long receptionTime = System.currentTimeMillis();
+						addMessage(receptionTime, tasksCompletedBatch);
+					}else{
+						LOG.debug("Message Handler - available = 0");
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+	}
+
+	public void addMessage(long time, String message){
+		LOG.debug("FeMessageProcessing - message added in Q");
+		TimeMessage timeMessage = new TimeMessage(time, message);
+		fifo.add(timeMessage);
+	}
+
+	public void stop(){
+		this.run = false;
+	}
+
+	@Override
+	public void run() {
+		long lastBatchRecpTime;
+
+
+		LOG.debug("FeMessageProcessing - started");
+		ConnectionHandler connectionHandler = new ConnectionHandler();
+		Thread connectionHandlerTh = new Thread(connectionHandler);
+		connectionHandlerTh.start();
+
+		while(run){
+			if (fifo.isEmpty()){
+				//TODO make sleep time a parameter -conf file-
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}else{
+				LOG.debug("FeMessageProcessing - reception");
+				lastBatchRecpTime = 0;
+				TimeMessage timeMessage = fifo.poll();
+				LOG.debug("receptTime="+ timeMessage.receptionTime + " message="+ timeMessage.message);
+				// 2 splitting. 1 to get (ID, delay) messages, then extract Id & delay
+				String[] messageSplit = pattern1.split(timeMessage.message);
+				//				LOG.debug("messagesplit1=" + messageSplit);
+				for(String unitMessage : messageSplit){
+					String[] info = pattern2.split(unitMessage);
+					//					LOG.debug("messagesplit2=" + info);
+					if(info.length != 2){
+						LOG.error("FeMessageProcessing - Wrong message format, too much information in a single message");
+					}else{
+						Integer taskId = Integer.parseInt(info[0]);
+						Long delay = Long.parseLong(info[1]);
+
+						if(taskId == null || delay == null){
+							LOG.error("FeMessageProcessing - Message format received not int:long");
+
+						}else if(taskId == 0){ // reception of the batching delay. All tasks in the batch are subtracted the duration of the batching
+							lastBatchRecpTime = delay;
+							for(int i : taskIds){
+								endTimes[i] = endTimes[i] - delay; 
+								BFrontend.taskCompleted();
+							}
+							taskIds.clear(); //clear list for next batch
+
+						}else if(taskId <= endTimes.length){
+							taskIds.add(taskId-1);
+							endTimes[taskId-1] = lastBatchRecpTime + timeMessage.receptionTime + delay;  //in case 2 batchs are in a single message
+
+						}else{
+							LOG.error("FeMessageProcessing - Received incorrect task Id");
+						}
+					}
+				}
+			}
+		}
+		LOG.debug("FeMessageProcessing - exiting");
+		int idx = 0; 
+		while(idx <= receptionThreads.length && receptionThreads[idx] != null ){
+			try {
+				receptionThreads[idx].join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		LOG.debug("FeMessageProcessing - exit completed");
+	}
+
+	public long[] getEndTimes() {
+		return endTimes;
+	}
+
+}

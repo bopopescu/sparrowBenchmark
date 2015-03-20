@@ -1,0 +1,7 @@
+#BFrontend
+experiment_s = 60
+number_tasks = 30
+task_duration_millis = 0
+
+#BBackend
+app_client_ip = 127.0.0.1
