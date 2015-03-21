@@ -59,15 +59,16 @@ public class FrontendMessageProcessing implements Runnable{
 					LOG.debug("Connection Handler - connection made");
 					index ++;
 				} catch (SocketException e){
+					LOG.debug("Connection Handler - socket exception");
 					e.printStackTrace();
 					break;
 				} catch (IOException e) {
 					e.printStackTrace();
+					break;
 				}
 
 			}
-			LOG.debug("Connection Handler - exit");
-			run = false;
+			LOG.debug("Connection Handler - exit complete");
 
 		}
 	}
@@ -102,6 +103,7 @@ public class FrontendMessageProcessing implements Runnable{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			LOG.debug("Message Handler - exit complete");
 		}
 
 	}
@@ -164,7 +166,7 @@ public class FrontendMessageProcessing implements Runnable{
 
 						}else if(taskId <= endTimes.length){
 							taskIds.add(taskId-1);
-							endTimes[taskId-1] = lastBatchRecpTime + timeMessage.receptionTime + delay;  //in case 2 batchs are in a single message
+							endTimes[taskId-1] = timeMessage.receptionTime + lastBatchRecpTime + delay;  //in case 2 batchs are in a single message
 
 						}else{
 							LOG.error("FeMessageProcessing - Received incorrect task Id");
@@ -178,12 +180,25 @@ public class FrontendMessageProcessing implements Runnable{
 		while(idx <= receptionThreads.length && receptionThreads[idx] != null ){
 			try {
 				receptionThreads[idx].join();
+				idx++;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
 		}
-		LOG.debug("FeMessageProcessing - exit completed");
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			LOG.error("FeMessageProcessing - Error while closing serversocket");
+			e.printStackTrace();
+		}
+		try {
+			connectionHandlerTh.join();
+		} catch (InterruptedException e) {
+			LOG.error("FeMessageProcessing - Error while joining connectionHandlerTh");
+			e.printStackTrace();
+		}
+		LOG.debug("FeMessageProcessing - exit complete");
 	}
 
 	public long[] getEndTimes() {

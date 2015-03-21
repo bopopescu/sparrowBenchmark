@@ -13,6 +13,7 @@ import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -178,12 +179,19 @@ public class BFrontend implements FrontendService.Iface {
 			serverSocket.close();
 			messageProcessing.stop();
 			messageProcessingTh.join();
-			LOG.debug("End times " + messageProcessing.getEndTimes()); //TODO do this print in BFrontend
+			jobLaunch.join();
+			long[] endTimes = messageProcessing.getEndTimes();
+			for(int i = 0; i < endTimes.length; i++ ){
+				LOG.debug("Sleep "+ i + " "+ (endTimes[i]-startTime));
+			}
+			client.close();
 
 		}
 		catch (Exception e) {
 			LOG.error("Fatal exception", e);
 		}
+		LOG.debug("BFronted exit complete");
+		
 	}
 
 
