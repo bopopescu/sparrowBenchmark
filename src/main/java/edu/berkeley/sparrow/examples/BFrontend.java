@@ -178,6 +178,7 @@ public class BFrontend implements FrontendService.Iface {
 			serverSocket.close();
 			messageProcessing.stop();
 			messageProcessingTh.join();
+			LOG.debug("End times " + messageProcessing.getEndTimes()); //TODO do this print in BFrontend
 
 		}
 		catch (Exception e) {
