@@ -184,6 +184,7 @@ public class FrontendMessageProcessing implements Runnable{
 			
 		}
 		LOG.debug("FeMessageProcessing - exit completed");
+		LOG.debug("End times " + getEndTimes());
 	}
 
 	public long[] getEndTimes() {
