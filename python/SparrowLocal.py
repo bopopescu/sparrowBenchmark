@@ -67,7 +67,7 @@ if __name__ == "__main__":
     parser.add_argument("-k", "--kill", choices = ['worker','client','all'], default = None)
     parser.add_argument("-l", "--launch", choices = ['worker','client','all'], default = None)
     parser.add_argument("-r", "--reset", action = "store_true", default = False)
-    parser.add_argument("-nw" "--numberworker", default = "")
+    parser.add_argument("-nw", "--numberworker", default = " ")
     
     
     args = parser.parse_args() 
@@ -81,5 +81,6 @@ if __name__ == "__main__":
     if args.kill != None:
         s_kill(args.kill)
     if args.launch != None:
+        print args
         launch(args.launch, args.numberworker)
     
