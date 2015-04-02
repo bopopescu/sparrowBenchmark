@@ -14,7 +14,7 @@
 
 import argparse, os
 
-pwd = "/home/thomas/workspace/sparrow-master"
+pwd = "/home/ubuntu/sparrow"
 #BFrontend
 experiment_s_L = [60] 
 number_tasks_L = [30,15]

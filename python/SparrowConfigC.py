@@ -1,6 +1,6 @@
 import argparse, os, re, sys
 
-pwd = "/home/thomas/workspace/sparrow-master/"
+pwd = "/home/ubuntu/sparrow/"
 fileName = "sparrow.conf"
 
 def find_line(lines):

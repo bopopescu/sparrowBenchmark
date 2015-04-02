@@ -2,9 +2,9 @@
 
 import argparse, json, os, shlex, subprocess, sys, time
 
-pwd = "/home/thomas/workspace/sparrow-master"
+pwd = "/home/ubuntu/sparrow"
 workerCommand = "java -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.examples.BBackend -c Conf/conf.Backend"
-clientCommand = "java -XX:+UseConcMarkSweepGC -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.daemon.SparrowDaemon -c sparrowlocal.conf"
+clientCommand = "java -XX:+UseConcMarkSweepGC -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.daemon.SparrowDaemon -c sparrow.conf"
 
 
 #SparrowPID file stores [CLIENT_PID,WORKER_PID]
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     if args.reset:
         pidFile = open('SparrowPID', 'w')
-        json.dump([0,0])
+        json.dump([0,0], pidFile)
         pidFile.close()
     if args.kill != None:
         s_kill(args.kill)
