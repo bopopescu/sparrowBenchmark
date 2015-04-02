@@ -13,8 +13,6 @@ import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
@@ -191,7 +189,7 @@ public class BFrontend implements FrontendService.Iface {
 			LOG.error("Fatal exception", e);
 		}
 		LOG.debug("BFronted exit complete");
-		
+
 	}
 
 

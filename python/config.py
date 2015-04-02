@@ -1,0 +1,2 @@
+ec2_key=AKIAIBGEG7QHRPL5SG4Q
+ec2_secret=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

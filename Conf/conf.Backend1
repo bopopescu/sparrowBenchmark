@@ -1,0 +1,2 @@
+app_client_ip = 127.0.0.1
+worker_threads = 1

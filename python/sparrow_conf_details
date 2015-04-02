@@ -1,0 +1,15 @@
+Simple front end conf options
+
+JOB_ARRIVAL_PERIOD_MILLIS
+EXPERIMENT_S -experiment duration-
+TASKS_PER_JOB
+TASK_DURATION_MILLIS
+SCHEDULER_PORT
+SCHEDULER_HOST
+
+Simple Back end conf options
+
+LISTEN_PORT
+NODE_MONITOR_HOST
+
+number of threads is hard coded

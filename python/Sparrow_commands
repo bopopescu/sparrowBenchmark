@@ -1,0 +1,5 @@
+java -XX:+UseConcMarkSweepGC -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.daemon.SparrowDaemon -c sparrow.conf
+
+java -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.examples.BBackend -c conf
+
+java -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.examples.BFrontend -c conf
