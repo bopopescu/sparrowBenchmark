@@ -55,8 +55,8 @@ def s_kill(victim):
             print "SparrowLocal - Worker still running at Client kill request. Killing worker first"
             subprocess.call("kill " + str(s[1]), shell = True)
             s[1] = 0 
-            subprocess.call("kill " + str(s[0]), shell = True)		
-            s[0] = 0 
+        subprocess.call("kill " + str(s[0]), shell = True)		
+        s[0] = 0 
         
     json.dump(s,pidFile)
     pidFile.close()
