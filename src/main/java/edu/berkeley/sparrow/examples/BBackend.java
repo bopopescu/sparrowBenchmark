@@ -75,7 +75,7 @@ public class BBackend implements BackendService.Iface {
 	 * Each task is launched in its own thread from a thread pool with WORKER_THREADS threads,
 	 * so this should be set equal to the maximum number of tasks that can be running on a worker.
 	 */
-	private static final int DEFAULT_WORKER_THREADS = 16;
+	private static final int DEFAULT_WORKER_THREADS = 1;
 	private static final String WORKER_THREADS = "worker_threads";
 	private static final String APP_ID = "Bsleep";
 
@@ -87,10 +87,14 @@ public class BBackend implements BackendService.Iface {
 	private static Client client;
 
 	private static final Logger LOG = Logger.getLogger(BBackend.class);
+	private static final String DEFAULT_LOG_LEVEL = "debug";
+	private static final String LOG_LEVEL = "log_level";
+	
 	private static ExecutorService executor;
 
-
-
+	private static SynchronizedWrite resultLog;
+	private static String ipAddress;
+	
 	/**
 	 * Keeps track of finished tasks.
 	 *
@@ -112,7 +116,7 @@ public class BBackend implements BackendService.Iface {
 			while (true) {
 				try {
 					TFullTaskId task = finishedTasks.take();
-					long endTime = System.currentTimeMillis();
+					long endTime = System.nanoTime();
 					Batching.add(Integer.parseInt(task.taskId), endTime);
 					client.tasksFinished(Lists.newArrayList(task));
 				} catch (InterruptedException e) {
@@ -141,15 +145,15 @@ public class BBackend implements BackendService.Iface {
 
 		@Override
 		public void run() {
-			long startTime = System.currentTimeMillis();
+			long startTime = System.nanoTime();
 			try {
 				Thread.sleep(taskDurationMillis);
 			} catch (InterruptedException e) {
 				LOG.error("Interrupted while sleeping: " + e.getMessage());
 			}
-			long endTime = System.currentTimeMillis();
-			LOG.debug("Task completed in " + (endTime - startTime) + "ms");
-			//TODO WRITE INFILE
+			long endTime = System.nanoTime();
+			LOG.debug("Task completed in " + (endTime - startTime)/1000000 + "ms");
+			resultLog.write(taskId.taskId, endTime - startTime, "running", ipAddress);
 			finishedTasks.add(taskId);
 		}
 	}
@@ -211,6 +215,7 @@ public class BBackend implements BackendService.Iface {
 	}
 
 	public static void main(String[] args) throws IOException, TException {
+		ipAddress = InetAddress.getLocalHost().toString();
 		OptionParser parser = new OptionParser();
 		parser.accepts("c", "configuration file").
 		withRequiredArg().ofType(String.class);
@@ -224,8 +229,6 @@ public class BBackend implements BackendService.Iface {
 
 		// Logger configuration: log to the console
 		BasicConfigurator.configure();
-		LOG.setLevel(Level.DEBUG);
-		LOG.debug("debug logging on");
 
 		Configuration conf = new PropertiesConfiguration();
 
@@ -236,6 +239,8 @@ public class BBackend implements BackendService.Iface {
 			} catch (ConfigurationException e) {}
 		}
 		// Start backend server
+		LOG.setLevel(Level.toLevel(conf.getString(LOG_LEVEL, DEFAULT_LOG_LEVEL)));
+		LOG.debug("debug logging on");
 		int listenPort = conf.getInt(LISTEN_PORT, DEFAULT_LISTEN_PORT);
 		int nodeMonitorPort = conf.getInt(NODE_MONITOR_PORT, NodeMonitorThrift.DEFAULT_NM_THRIFT_PORT);
 		batchingDelay = conf.getLong(BATCHING_DELAY, DEFAULT_BATCHING_DELAY);
@@ -244,6 +249,10 @@ public class BBackend implements BackendService.Iface {
 		appClientAdress = InetAddress.getByName(conf.getString(APP_CLIENT_IP));
 		appClientPortNumber = conf.getInt(APP_CLIENT_PORT_NUMBER, DEFAULT_APP_CLIENT_PORT_NUMBER);
 		executor = Executors.newFixedThreadPool(workerThread);
+		// Starting logging of results
+		resultLog = new SynchronizedWrite("ResultsBackend.txt");
+		Thread resultLogTh = new Thread(resultLog);
+		resultLogTh.start();
 		
 		BBackend protoBackend = new BBackend();
 		BackendService.Processor<BackendService.Iface> processor =

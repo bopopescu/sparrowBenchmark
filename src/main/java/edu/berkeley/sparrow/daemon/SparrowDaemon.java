@@ -52,7 +52,7 @@ public class SparrowDaemon {
         SparrowConf.INTERNAL_THRIFT_PORTS + " not of equal length");
     }
     if (nmPorts.length > 1 &&
-        (!conf.getString(SparrowConf.DEPLYOMENT_MODE, "").equals("standalone"))) {
+        (!conf.getString(SparrowConf.DEPLOYMENT_MODE, "").equals("standalone"))) {
       throw new ConfigurationException("Mutliple NodeMonitors only allowed " +
       		"in standalone deployment");
     }

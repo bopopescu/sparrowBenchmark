@@ -31,7 +31,7 @@ import edu.berkeley.sparrow.thrift.TFullTaskId;
 import edu.berkeley.sparrow.thrift.TTaskLaunchSpec;
 import edu.berkeley.sparrow.thrift.TUserGroupInfo;
 
-/**
+/**	
  * A TaskScheduler is a buffer that holds task reservations until an application backend is
  * available to run the task. When a backend is ready, the TaskScheduler requests the task
  * from the {@link Scheduler} that submitted the reservation.
@@ -76,8 +76,9 @@ public abstract class TaskScheduler {
 
   private final static Logger LOG = Logger.getLogger(TaskScheduler.class);
   private final static Logger AUDIT_LOG = Logging.getAuditLogger(TaskScheduler.class);
-  private String ipAddress;
-
+  public String ipAddress;
+  
+  
   protected Configuration conf;
   private final BlockingQueue<TaskSpec> runnableTaskQueue =
       new LinkedBlockingQueue<TaskSpec>();
@@ -127,6 +128,8 @@ public abstract class TaskScheduler {
   protected void makeTaskRunnable(TaskSpec task) {
     try {
       LOG.debug("Putting reservation for request " + task.requestId + " in runnable queue");
+      LOG.debug( System.nanoTime() + " " + ipAddress);
+      //resultLog.write(task.requestId, System.nanoTime(), "Put", ipAddress ); //XXX 
       runnableTaskQueue.put(task);
     } catch (InterruptedException e) {
       LOG.fatal("Unable to add task to runnable queue: " + e.getMessage());

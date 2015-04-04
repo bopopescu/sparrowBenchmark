@@ -61,7 +61,7 @@ public class SparrowConf {
   public final static int DEFAULT_SYSTEM_CPUS = 4;
 
   // Values: "standalone", "configbased." Only "configbased" works currently.
-  public final static String DEPLYOMENT_MODE = "deployment.mode";
+  public final static String DEPLOYMENT_MODE = "deployment.mode";
   public final static String DEFAULT_DEPLOYMENT_MODE = "production";
 
   /** The ratio of probes used in a scheduling decision to tasks. */

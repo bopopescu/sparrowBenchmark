@@ -14,3 +14,6 @@ target/
 /sparrow_audit.1426967138054.342454701.log
 /sparrow_audit.1426967478284.433504208.log
 /sparrow.conf
+/python/AWSconf.py
+/python/matrix.pem
+/sparrowlocal.conf

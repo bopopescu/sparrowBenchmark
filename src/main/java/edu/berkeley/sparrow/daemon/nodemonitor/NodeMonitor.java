@@ -70,7 +70,7 @@ public class NodeMonitor {
 
   public void initialize(Configuration conf, int nodeMonitorInternalPort)
       throws UnknownHostException {
-    String mode = conf.getString(SparrowConf.DEPLYOMENT_MODE, "unspecified");
+    String mode = conf.getString(SparrowConf.DEPLOYMENT_MODE, "unspecified");
     if (mode.equals("standalone")) {
       state = new StandaloneNodeMonitorState();
     } else if (mode.equals("configbased")) {

@@ -8,11 +8,15 @@ package edu.berkeley.sparrow.examples;
  *
  */
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
@@ -93,14 +97,14 @@ public class BFrontend implements FrontendService.Iface {
 				spec.setMessage(message.array());
 				tasks.add(spec);
 			}
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 			try {
 				client.submitJob(APPLICATION_ID, tasks, USER);
 			} catch (TException e) {
 				LOG.error("Scheduling request failed!", e);
 			}
-			long end = System.currentTimeMillis();
-			LOG.debug("Scheduling request duration " + (end - startTime) + "ms");
+			long end = System.nanoTime();
+			LOG.debug("Scheduling request duration " + (end - startTime)/1000000 + "ms");
 		}
 
 	}
@@ -149,39 +153,49 @@ public class BFrontend implements FrontendService.Iface {
 			Thread messageProcessingTh = new Thread(messageProcessing);
 			messageProcessingTh.start();
 
-			LOG.debug("Message processing initilized");			
+			LOG.debug("Message processing initilized");
 
 			JobLaunchRunnable runnable = new JobLaunchRunnable(numberTasks, taskDurationMillis);
 			Thread jobLaunch = new Thread(runnable);
 			jobLaunch.start();
 
 			LOG.debug("sleeping");
-			long startTime = System.currentTimeMillis();
-			//runnable.getStartTime();
-			while (tasksCompleted < numberTasks && System.currentTimeMillis() < startTime + experimentDurationS * 1000 ) {
+			long startTime = System.nanoTime();
+			long maxEndTime = startTime + experimentDurationS * 1000000;
+			while (tasksCompleted < numberTasks && System.nanoTime() < maxEndTime ) {
 				LOG.debug("Tasks completed = "+ tasksCompleted);
 				Thread.sleep(500);
 			}
-			long endTime = System.currentTimeMillis();
-			if(endTime < startTime + experimentDurationS * 1000 ){
+			long endTime = messageProcessing.lastReceptionTime;
+			
+			LOG.debug("task completed " + tasksCompleted + " " + endTime + " " + maxEndTime);
+			FileWriter fw = new FileWriter("Results.txt");
+			BufferedWriter bw = new BufferedWriter(fw);
+			String ip = InetAddress.getLocalHost().toString();
+			if(endTime < maxEndTime || tasksCompleted == numberTasks){
 				long expTime = endTime - startTime;
 				LOG.debug("Tasks completed = "+ tasksCompleted);
-				LOG.debug("Experiment ended  in " + expTime + "ms");
-				// TODO write in file
+				LOG.debug("Experiment ended  in " + (expTime/1000000) + "ms");
+				bw.write("0," + "Experiment full time" + "," + expTime + "," + ip + "," + Thread.currentThread().getId() + "\n");
 			}else{
 				LOG.debug("Experiment ended - Timeout");
 			}
 
 			//long[] endTimes = messageProcessing.getEndTimes();
-			// TODO write endTimes in file
 			serverSocket.close();
 			messageProcessing.stop();
 			messageProcessingTh.join();
 			jobLaunch.join();
 			long[] endTimes = messageProcessing.getEndTimes();
 			for(int i = 0; i < endTimes.length; i++ ){
-				LOG.debug("Sleep "+ i + " "+ (endTimes[i]-startTime));
+				LOG.debug("Sleep "+ i + " "+ (endTimes[i] - startTime)/1000000 + "ms");
+				bw.write((i+1) + "," + "Full time" + "," + (endTimes[i] - startTime) + "," + ip + "," + Thread.currentThread().getId() + "\n");
+				
 			}
+			bw.close();
+			
+			
+			LOG.debug(endTimes[0] + " "+ endTime + " " + (endTime - endTimes[0]));
 			client.close();
 
 		}
@@ -189,6 +203,7 @@ public class BFrontend implements FrontendService.Iface {
 			LOG.error("Fatal exception", e);
 		}
 		LOG.debug("BFronted exit complete");
+		return;
 
 	}
 

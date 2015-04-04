@@ -8,6 +8,7 @@ class SparrowDistant:
         reservation = self.EC2.run_instances(image_id= AMI, instance_type = 't2.micro', key_name= sshKey, min_count = number, max_count = number)
         notLaunched = range(number)
         ips = []
+        privateIps = []
         toLaunch = number
         time.sleep(1)
         startTime = time.clock()
@@ -18,8 +19,8 @@ class SparrowDistant:
             idx = notLaunched.pop(0)
             update = reservation.instances[idx].update()
             if update == "running":
-                print reservation.instances[idx].ip_address
                 ips.append(reservation.instances[idx].ip_address)
+                privateIps.append(reservation.instances[idx].private_ip_address)
                 self.instances.append(reservation.instances[idx])
                 toLaunch -= 1
             else:
@@ -31,7 +32,7 @@ class SparrowDistant:
         else:
             print "".join(("SparrowDistant - Timeout", str(toLaunch), " instances not launched in time"))
         
-        return ips
+        return (privateIps, ips)
      
     def terminateAll(self):   
         i = 0

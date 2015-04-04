@@ -81,6 +81,5 @@ if __name__ == "__main__":
     if args.kill != None:
         s_kill(args.kill)
     if args.launch != None:
-        print args
         launch(args.launch, args.numberworker)
     

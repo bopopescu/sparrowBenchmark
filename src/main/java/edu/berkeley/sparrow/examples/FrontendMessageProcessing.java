@@ -26,7 +26,8 @@ public class FrontendMessageProcessing implements Runnable{
 	private String idEndTimeSeparator = ":";
 	private Pattern pattern2 = Pattern.compile(idEndTimeSeparator);
 	private ArrayList<Integer> taskIds = new ArrayList<Integer>();
-
+	public long lastReceptionTime;
+	
 	public FrontendMessageProcessing(int numberOfTasks, Logger log, ServerSocket serverSocket) {
 		this.endTimes = new long[numberOfTasks];
 		this.LOG = log;
@@ -59,8 +60,7 @@ public class FrontendMessageProcessing implements Runnable{
 					LOG.debug("Connection Handler - connection made");
 					index ++;
 				} catch (SocketException e){
-					LOG.debug("Connection Handler - socket exception");
-					e.printStackTrace();
+					LOG.debug("Connection Handler - socket exception => exiting");
 					break;
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -88,7 +88,7 @@ public class FrontendMessageProcessing implements Runnable{
 					if (in.available() > 0){
 						LOG.debug("Message Handler - available > 0");
 						String tasksCompletedBatch = in.readUTF();
-						long receptionTime = System.currentTimeMillis();
+						long receptionTime = System.nanoTime();
 						addMessage(receptionTime, tasksCompletedBatch);
 					}else{
 						LOG.debug("Message Handler - available = 0");
@@ -140,6 +140,7 @@ public class FrontendMessageProcessing implements Runnable{
 				LOG.debug("FeMessageProcessing - reception");
 				lastBatchRecpTime = 0;
 				TimeMessage timeMessage = fifo.poll();
+				lastReceptionTime = timeMessage.receptionTime;
 				LOG.debug("receptTime="+ timeMessage.receptionTime + " message="+ timeMessage.message);
 				// 2 splitting. 1 to get (ID, delay) messages, then extract Id & delay
 				String[] messageSplit = pattern1.split(timeMessage.message);

@@ -116,7 +116,7 @@ public class Scheduler {
 
   public void initialize(Configuration conf, InetSocketAddress socket) throws IOException {
     address = Network.socketAddressToThrift(socket);
-    String mode = conf.getString(SparrowConf.DEPLYOMENT_MODE, "unspecified");
+    String mode = conf.getString(SparrowConf.DEPLOYMENT_MODE, "unspecified");
     this.conf = conf;
     if (mode.equals("standalone")) {
       state = new StandaloneSchedulerState();

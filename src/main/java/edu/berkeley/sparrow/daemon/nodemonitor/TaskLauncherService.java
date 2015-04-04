@@ -36,6 +36,7 @@ import edu.berkeley.sparrow.daemon.util.Logging;
 import edu.berkeley.sparrow.daemon.util.Network;
 import edu.berkeley.sparrow.daemon.util.Resources;
 import edu.berkeley.sparrow.daemon.util.TClients;
+import edu.berkeley.sparrow.examples.SynchronizedWrite;
 import edu.berkeley.sparrow.thrift.BackendService;
 import edu.berkeley.sparrow.thrift.GetTaskService;
 import edu.berkeley.sparrow.thrift.TFullTaskId;
@@ -63,6 +64,9 @@ public class TaskLauncherService {
 
   private TaskScheduler scheduler;
 
+  
+  public SynchronizedWrite resultLog;
+  
   /** A runnable that spins in a loop asking for tasks to launch and launching them. */
   private class TaskLaunchRunnable implements Runnable {
 
@@ -93,6 +97,7 @@ public class TaskLauncherService {
         task.taskSpec = taskLaunchSpecs.get(0);
         LOG.debug("Received task for request " + task.requestId + ", task " +
                   task.taskSpec.getTaskId());
+        resultLog.write(task.taskSpec.getTaskId(), System.nanoTime(), "Received", scheduler.ipAddress ); //XXX
 
         // Launch the task on the backend.
         AUDIT_LOG.info(Logging.auditEventString("node_monitor_task_launch",
@@ -103,7 +108,8 @@ public class TaskLauncherService {
             task.previousTaskId));
         executeLaunchTaskRpc(task);
         LOG.debug("Launched task " + task.taskSpec.getTaskId() + " for request " + task.requestId +
-            " on application backend at system time " + System.currentTimeMillis());
+            " on application backend at system time " + System.currentTimeMillis()); 
+        resultLog.write(task.taskSpec.getTaskId(), System.nanoTime(), "Launched", scheduler.ipAddress ); //XXX
       }
 
     }
@@ -173,6 +179,7 @@ public class TaskLauncherService {
   public void initialize(Configuration conf, TaskScheduler scheduler,
       int nodeMonitorPort) {
     numThreads = scheduler.getMaxActiveTasks();
+    this.resultLog = new SynchronizedWrite("ResultsScheduling.txt");
     if (numThreads <= 0) {
       // If the scheduler does not enforce a maximum number of tasks, just use a number of
       // threads equal to the number of cores.
@@ -181,6 +188,8 @@ public class TaskLauncherService {
     this.scheduler = scheduler;
     nodeMonitorInternalAddress = new THostPort(Network.getIPAddress(conf), nodeMonitorPort);
     ExecutorService service = Executors.newFixedThreadPool(numThreads);
+  	Thread resultLogTh = new Thread(this.resultLog);
+  	resultLogTh.start();
     for (int i = 0; i < numThreads; i++) {
       service.submit(new TaskLaunchRunnable());
     }
