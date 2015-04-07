@@ -5,7 +5,7 @@ class SparrowDistant:
 
 
     def launchInstances(self, number, timeOut):
-        reservation = self.EC2.run_instances(image_id= AMI, instance_type = 't2.micro', key_name= sshKey, min_count = number, max_count = number)
+        reservation = self.EC2.run_instances(image_id= AMI, instance_type = instanceType, key_name= sshKey, min_count = number, max_count = number)
         notLaunched = range(number)
         ips = []
         privateIps = []

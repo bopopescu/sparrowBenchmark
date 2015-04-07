@@ -14,23 +14,43 @@ def find_line(lines):
         if match != None:
             return lineNumber
     
-
-if __name__ == "__main__":
-
+def addIps(ips, port=20502):
     os.chdir(pwd)
-    parser = argparse.ArgumentParser(description = "Adds IPaddresses to Sparrow Client config file", prog = "SparrowConfigC.py")
-    parser.add_argument("IPs", nargs = "*")
-
-    args = parser.parse_args() 
-    
+    ipsPort = [":".join(x, port) for x in ips]
     fd = open(fileName,'r')
     content= fd.readlines()
     fd.close()	
     lineNumber = find_line(content)
     
-    content[lineNumber] = "".join( (",".join((content[lineNumber][:-1], ) + tuple(args.IPs)), "\n"))
+    content[lineNumber] = "".join( (",".join((content[lineNumber][:-1], ) + tuple(ipsPort)), "\n"))
     
     fp=open(pwd + fileName,'w')
     fp.writelines(content)
-    fp.close()    
+    fp.close()
 
+def setIps(ips, port=20502):
+    os.chdir(pwd)
+    ipsPort = [":".join(x, port) for x in ips]
+    fd = open(fileName,'r')
+    content= fd.readlines()
+    fd.close()	
+    lineNumber = find_line(content)
+    
+    content[lineNumber] = "".join( ("static.node_monitors = ",) + (",".join(tuple(ipsPort)), "\n"))
+    
+    fp=open(pwd + fileName,'w')
+    fp.writelines(content)
+    fp.close()
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description = "Adds IPaddresses to Sparrow Client config file", prog = "SparrowConfigC.py")
+    parser.add_argument("mode", choices = ["set","add"], nargs = 1)
+    parser.add_argument("IPs", nargs = "*")
+    
+    args = parser.parse_args() 
+    
+    if args.mode == "set":
+        setIps(args.IPs)
+    else:
+        addIPs(args.IPs)

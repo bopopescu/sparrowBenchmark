@@ -10,6 +10,7 @@ package edu.berkeley.sparrow.examples;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -203,6 +204,18 @@ public class BFrontend implements FrontendService.Iface {
 			LOG.error("Fatal exception", e);
 		}
 		LOG.debug("BFronted exit complete");
+		
+		FileWriter fw;
+		try {
+			fw = new FileWriter("Finish.txt");
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write("Experience finished");
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		return;
 
 	}
