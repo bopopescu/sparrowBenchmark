@@ -17,13 +17,13 @@ import argparse, os
 pwd = "/home/ubuntu/sparrow"
 #BFrontend
 experiment_s_L = [60] 
-number_tasks_L = [30,15]
-task_duration_millis_L = [0,1] 
+number_tasks_L = [30]
+task_duration_millis_L = [0] 
 
 #BBackend
-app_client_ip = ["127.0.0.1"]
+app_client_ip = ["172.31.22.75"]
 batching_delay_L = []
-worker_threads_L = [1,2,4]
+worker_threads_L = [2]
 
 #determines next combination of options
 def next(optionIdxs, maxIdxs):

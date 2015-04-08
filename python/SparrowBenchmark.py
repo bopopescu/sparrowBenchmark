@@ -6,7 +6,7 @@ import shlex, SparrowDistant, SparrowSSH, string, subprocess, time
     #[index of frontend config, index of backend config, number of workers]
 
 commandFrontend = "java -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.examples.BFrontend -c Conf/conf.Frontend"
-frontendPrivateIp = "FrontendprivateIp"
+frontendPrivateIp = "172.31.22.75"
 benchmarks = [[1,1,1]]
 benchmarks = sorted(benchmarks, key=lambda benchmark: benchmark[2])
 workerPrivateIps = []
@@ -23,19 +23,19 @@ print "SPARROW BENCHMARKING"
 
 for benchmark in benchmarks:
     lackingInstances = benchmark[2] - len(instanceLauncher.instances)
-    privateIps, ips = instanceLauncher.(lackingInstances, lackingInstances*30)
+    privateIps, ips = instanceLauncher.launchInstances(lackingInstances, lackingInstances*30)
     
     #store configs
-    resultsFp = open("Results.txt", a)
-    confFile = open("Conf/conf.Frontend"+benchmark[1],r)
+    resultsFp = open("Results.txt", "a")
+    confFile = open("Conf/conf.Frontend"+str(benchmark[1]),"r")
     content = confFile.read()
     count = content.count("\n")
     resultsFp.write("\nFrontend config," + content.replace("\n", ",", count-1))
-    confFile = open("Conf/conf.Backend"+benchmark[1],r)
+    confFile = open("Conf/conf.Backend"+str(benchmark[1]),"r")
     content = confFile.read()
     count = content.count("\n")
     resultsFp.write("BackendConfig," + content.replace("\n", ",", count-1))
-    resultsFp.write("number of workers," + benchmark[2] + "\n")
+    resultsFp.write("number of workers," + str(benchmark[2]) + "\n")
     resultsFp.close()
     
     raw_input("storeconfig")
@@ -58,7 +58,7 @@ for benchmark in benchmarks:
     SparrowSSH.setClientConfigIps(frontendPrivateIp + workerPrivateIps, ips)
     raw_input("worker conf set")
     #Launch worker/client on instance
-    for ip in workerIps
+    for ip in workerIps:
         SparrowSSH.startWorker(ip, benchmark[1])        
 
     print "5s delay for start ups"
@@ -66,7 +66,7 @@ for benchmark in benchmarks:
     raw_input("worker launched")
     sparrowFrontend = supbrocess.Popen(shlex.split(commandFrontend+benchmark[0]))
     
-    while time.clock - startTime < Max delay:
+    while time.clock - startTime < 300:
         #wait for front end to finish
         time.sleep(5)
         fd = open("Finish.txt", "r")
@@ -75,7 +75,7 @@ for benchmark in benchmarks:
             print "Experience ended"
         fd.close()
     raw_input("exp end")
-    resultsFp = open("Results.txt", a)
+    resultsFp = open("Results.txt", "a")
         
     #Kill worker/client on instance
     for ip in workerIps:

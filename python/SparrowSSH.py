@@ -47,7 +47,7 @@ def setClientConfigIps(ipsToStore, workerIps):
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(ip, username="ubuntu",allow_agent=False, key_filename = "matrix.pem")
 
-    stdin, stdout, stderr = client.exec_command(setIPCommand + " ".join(tuple(ips))
+    stdin, stdout, stderr = client.exec_command(setIPCommand + " ".join(tuple(ips)))
         
     client.close()
     
