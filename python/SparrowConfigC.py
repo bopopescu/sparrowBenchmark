@@ -1,6 +1,6 @@
 import argparse, os, re, sys
 
-pwd = "/home/ubuntu/sparrow/"
+pwd = "/home/thomas/workspace/sparrow-master/"
 fileName = "sparrow.conf"
 
 def find_line(lines):
@@ -16,7 +16,7 @@ def find_line(lines):
     
 def addIps(ips, port=20502):
     os.chdir(pwd)
-    ipsPort = [":".join(x, port) for x in ips]
+    ipsPort = [":".join((x, port)) for x in ips]
     fd = open(fileName,'r')
     content= fd.readlines()
     fd.close()	
@@ -30,7 +30,7 @@ def addIps(ips, port=20502):
 
 def setIps(ips, port=20502):
     os.chdir(pwd)
-    ipsPort = [":".join(x, port) for x in ips]
+    ipsPort = [":".join((x, port)) for x in ips]
     fd = open(fileName,'r')
     content= fd.readlines()
     fd.close()	

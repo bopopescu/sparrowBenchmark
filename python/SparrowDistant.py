@@ -5,16 +5,16 @@ class SparrowDistant:
 
 
     def launchInstances(self, number, timeOut):
-        reservation = self.EC2.run_instances(image_id= AMI, instance_type = instanceType, key_name= sshKey, min_count = number, max_count = number)
+        reservation = self.EC2.run_instances(image_id= AMI, instance_type = instanceType, key_name= sshKey, min_count = number, max_count = number, security_group_ids=[securityGroup])
         notLaunched = range(number)
         ips = []
         privateIps = []
         toLaunch = number
         time.sleep(1)
-        startTime = time.clock()
+        startTime = time.time()
 
-        while toLaunch > 0 and (time.clock() - startTime) < timeOut:
-            print "".join(("SparrowDistant - still ", str(toLaunch), " instances to launch")) 
+        while toLaunch > 0 and (time.time() - startTime) < timeOut:
+            print "".join(("SparrowDistant - still ", str(toLaunch), " instance(s) to launch")) 
 
             idx = notLaunched.pop(0)
             update = reservation.instances[idx].update()
@@ -28,7 +28,7 @@ class SparrowDistant:
                 time.sleep(5)
         
         if toLaunch == 0:
-            print "".join(("SparrowDistant - ", str(number), " instances launched in ", str(time.clock() - startTime), " seconds"))
+            print "".join(("SparrowDistant - ", str(number), " instance(s) launched in ", str(time.time() - startTime), " seconds"))
         else:
             print "".join(("SparrowDistant - Timeout", str(toLaunch), " instances not launched in time"))
         

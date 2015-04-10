@@ -14,7 +14,7 @@ def startWorker(ip, configidx):
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(ip, username="ubuntu",allow_agent=False, key_filename = "matrix.pem")
 
-    stdin, stdout, stderr = client.exec_command(workerCommand + configidx)
+    stdin, stdout, stderr = client.exec_command(workerCommand + str(configidx))
     
     client.close()
 
@@ -43,21 +43,22 @@ def grabResults(fp, ip):
     client.close()
     
 def setClientConfigIps(ipsToStore, workerIps):
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(ip, username="ubuntu",allow_agent=False, key_filename = "matrix.pem")
-
-    stdin, stdout, stderr = client.exec_command(setIPCommand + " ".join(tuple(ips)))
-        
-    client.close()
-    
-def updateClientConfigIps(additionalIps, workerIps):
-    for ip in ip_list:
+    for ip in workerIps:
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(ip, username="ubuntu",allow_agent=False, key_filename = "matrix.pem")
 
-        stdin, stdout, stderr = client.exec_command(updateIPCommand + " ".join(tuple(ipPortList)))
+        stdin, stdout, stderr = client.exec_command(setIPCommand + " ".join(tuple(ipsToStore)))
+            
+        client.close()
+    
+def updateClientConfigIps(additionalIps, workerIps):
+    for ip in workerIps:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(ip, username="ubuntu",allow_agent=False, key_filename = "matrix.pem")
+
+        stdin, stdout, stderr = client.exec_command(updateIPCommand + " ".join(tuple(additionalIps)))
 
         client.close()
     

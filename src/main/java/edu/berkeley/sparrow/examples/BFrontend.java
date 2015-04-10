@@ -203,7 +203,6 @@ public class BFrontend implements FrontendService.Iface {
 		catch (Exception e) {
 			LOG.error("Fatal exception", e);
 		}
-		LOG.debug("BFronted exit complete");
 		
 		FileWriter fw;
 		try {
@@ -215,6 +214,7 @@ public class BFrontend implements FrontendService.Iface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		LOG.debug("BFronted exit complete");
 		
 		return;
 
