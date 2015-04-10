@@ -1,8 +1,8 @@
 ## kill/launch worker/sparrow
 
 import argparse, json, os, shlex, subprocess, sys, time
+from localpath import *
 
-pwd = "/home/ubuntu/sparrow"
 workerCommand = "java -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.examples.BBackend -c Conf/conf.Backend"
 clientCommand = "java -XX:+UseConcMarkSweepGC -cp target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.daemon.SparrowDaemon -c sparrow.conf"
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     parser.add_argument("-k", "--kill", choices = ['worker','client','all'], default = None)
     parser.add_argument("-l", "--launch", choices = ['worker','client','all'], default = None)
     parser.add_argument("-r", "--reset", action = "store_true", default = False)
-    parser.add_argument("-nw", "--numberworker", default = " ")
+    parser.add_argument("-nw", "--numberworker", default = "")
     
     
     args = parser.parse_args() 
