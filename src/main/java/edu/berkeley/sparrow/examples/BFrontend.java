@@ -162,7 +162,7 @@ public class BFrontend implements FrontendService.Iface {
 			jobLaunch.start();
 
 			LOG.debug("sleeping");
-			long maxEndTime = startTime + experimentDurationS * 1000000;
+			long maxEndTime = startTime + experimentDurationS * 1000000000;
 			while (tasksCompleted < numberTasks && System.nanoTime() < maxEndTime ) {
 				LOG.debug("Tasks completed = "+ tasksCompleted);
 				Thread.sleep(500);
