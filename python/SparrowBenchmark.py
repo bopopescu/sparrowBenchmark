@@ -1,4 +1,4 @@
-import shlex, SparrowDistant, SparrowConfigC, SparrowSSH, string, subprocess, time 
+import os, shlex, SparrowDistant, SparrowConfigC, SparrowSSH, string, subprocess, time 
 
 #SparrowBenchmark
 
@@ -22,7 +22,7 @@ AwsDns = ".us-west-2.compute.amazonaws.com:~/sparrow/Conf/"
 instanceLauncher = SparrowDistant.SparrowDistant()
 print "---SPARROW BENCHMARKING---\n"
 
-for benchmark in benchmarks:
+for benchmark in benchmarks:    
     lackingInstances = benchmark[2] - len(instanceLauncher.instances)
     privateIps, ips = instanceLauncher.launchInstances(lackingInstances, lackingInstances*30)
     
@@ -40,10 +40,13 @@ for benchmark in benchmarks:
     resultsFp.close()
     
     #raw_input("storeconfig")
+    SparrowConfigC.setIps([frontendPrivateIp])
     print "start sleep"
     time.sleep(60)
     print "end sleep"
+    
     #copy conf files on new workers
+    os.chdir("/home/thomas/workspace/sparrow-master/python")
     for ip in ips:
         print "updating " + ip
         scpIp = string.replace(ip, ".", "-")
@@ -61,6 +64,7 @@ for benchmark in benchmarks:
     workerIps += ips
     
       #set conf file of new workers
+    os.chdir("/home/thomas/workspace/sparrow-master/python")
     SparrowSSH.setClientConfigIps(workerPrivateIps, ips)
     
     #raw_input("worker conf set")
@@ -71,20 +75,23 @@ for benchmark in benchmarks:
     print "30s delay for start ups"
     time.sleep(30)
     raw_input("worker launched\n")
-    subprocess.call(shlex.split("python SparrowLocal.py -r"))
-    subprocess.call(shlex.split("python SparrowLocal.py -l client"))
+    #subprocess.call(shlex.split("python SparrowLocal.py -r"))
+    #subprocess.call(shlex.split("python SparrowLocal.py -l client"))
     sparrowFrontend = subprocess.Popen(shlex.split(commandFrontend+str(benchmark[0])))
     
+    os.chdir("/home/thomas/workspace/sparrow-master")
     startTime = time.time()
     while time.time() - startTime < 300:
         #wait for front end to finish
         time.sleep(5)
+        print "Benchmark - check Finish.txt"
         fd = open("../Finish.txt", "r")
         if fd.readline() == "Experience finished":
             run = False
             print "Experience ended"
         fd.close()
-    raw_input("exp end")
+        
+    raw_input("exp end, press enter")
     resultsFp = open("../Results.txt", "a")
         
     #Kill worker/client on instance

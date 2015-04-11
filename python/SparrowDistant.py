@@ -10,7 +10,7 @@ class SparrowDistant:
         ips = []
         privateIps = []
         toLaunch = number
-        time.sleep(1)
+        time.sleep(5)
         startTime = time.time()
 
         while toLaunch > 0 and (time.time() - startTime) < timeOut:

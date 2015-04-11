@@ -193,8 +193,10 @@ public class BFrontend implements FrontendService.Iface {
 				bw.write((i+1) + "," + "Full time" + "," + (endTimes[i] - startTime) + "," + ip + "," + Thread.currentThread().getId() + "\n");
 				
 			}
+			bw.flush();
 			bw.close();
-			
+			fw.flush();
+			fw.close();
 			
 			LOG.debug(endTimes[0] + " "+ endTime + " " + (endTime - endTimes[0]));
 			client.close();
@@ -209,6 +211,9 @@ public class BFrontend implements FrontendService.Iface {
 			fw = new FileWriter("Finish.txt");
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write("Experience finished");
+			bw.flush();
+			bw.close();
+			fw.flush();
 			fw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
