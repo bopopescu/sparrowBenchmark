@@ -24,8 +24,8 @@ print "---SPARROW BENCHMARKING---\n"
 
 SparrowConfigC.setIps([frontendPrivateIp])
 for benchmark in benchmarks:    
-
-    subprocess.call(shlex.split("echo "" > ../Finished.txt", shell = True)
+    os.chdir("/home/ubuntu/sparrow/python")
+    subprocess.call(shlex.split("echo "" > ../Finished.txt"), shell = True)
     lackingInstances = benchmark[2] - len(instanceLauncher.instances)
     privateIps, ips = instanceLauncher.launchInstances(lackingInstances, lackingInstances*30)
     
@@ -48,7 +48,7 @@ for benchmark in benchmarks:
     print "end sleep"
     
     #copy conf files on new workers
-    os.chdir("/home/thomas/workspace/sparrow-master/python")
+    os.chdir("/home/ubuntu/sparrow/python")
     for ip in ips:
         print "updating " + ip
         scpIp = string.replace(ip, ".", "-")
@@ -66,7 +66,7 @@ for benchmark in benchmarks:
     workerIps += ips
     
       #set conf file of new workers
-    os.chdir("/home/thomas/workspace/sparrow-master/python")
+    os.chdir("/home/ubuntu/sparrow/python")
     SparrowSSH.setClientConfigIps(workerPrivateIps, ips)
     
     #raw_input("worker conf set")
@@ -81,9 +81,9 @@ for benchmark in benchmarks:
     #subprocess.call(shlex.split("python SparrowLocal.py -l client"))
     sparrowFrontend = subprocess.Popen(shlex.split(commandFrontend+str(benchmark[0])))
     
-    os.chdir("/home/thomas/workspace/sparrow-master")
+    os.chdir("/home/ubuntu/sparrow/python")
     startTime = time.time()
-    while time.time() - startTime < 300:
+    while run and time.time() - startTime < 300:
         #wait for front end to finish
         time.sleep(5)
         print "Benchmark - check Finish.txt"
