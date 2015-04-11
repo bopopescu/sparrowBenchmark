@@ -22,7 +22,10 @@ AwsDns = ".us-west-2.compute.amazonaws.com:~/sparrow/Conf/"
 instanceLauncher = SparrowDistant.SparrowDistant()
 print "---SPARROW BENCHMARKING---\n"
 
+SparrowConfigC.setIps([frontendPrivateIp])
 for benchmark in benchmarks:    
+
+    subprocess.call(shlex.split("echo "" > ../Finished.txt", shell = True)
     lackingInstances = benchmark[2] - len(instanceLauncher.instances)
     privateIps, ips = instanceLauncher.launchInstances(lackingInstances, lackingInstances*30)
     
@@ -40,7 +43,6 @@ for benchmark in benchmarks:
     resultsFp.close()
     
     #raw_input("storeconfig")
-    SparrowConfigC.setIps([frontendPrivateIp])
     print "start sleep"
     time.sleep(60)
     print "end sleep"
