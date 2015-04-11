@@ -169,7 +169,7 @@ public class BFrontend implements FrontendService.Iface {
 			}
 			long endTime = messageProcessing.lastReceptionTime;
 			
-			LOG.debug("task completed " + tasksCompleted + " " + endTime + " " + maxEndTime);
+			LOG.debug("task completed " + tasksCompleted + " start " + startTime + " end " + endTime + " maxend " + maxEndTime);
 			FileWriter fw = new FileWriter("Results.txt");
 			BufferedWriter bw = new BufferedWriter(fw);
 			String ip = InetAddress.getLocalHost().toString();
