@@ -62,7 +62,7 @@ public class Batching implements Runnable{
 					LOG.debug("batching fifo pop");
 					batchingStartTime = info.time;
 					message = info.id + ":0;";
-					while(System.nanoTime()-batchingStartTime < batchingDelay*1000000 ){
+					while(System.currentTimeMillis()-batchingStartTime < batchingDelay ){
 						info = fifo.poll();
 						if(info == null){
 							try {
@@ -74,7 +74,7 @@ public class Batching implements Runnable{
 							message = message + info.id + ":" +(info.time - batchingStartTime) + ";";
 						}
 					}
-					message = message + "0" + ":" +(System.nanoTime() - batchingStartTime) + ";";
+					message = message + "0" + ":" +(System.currentTimeMillis() - batchingStartTime) + ";";
 					LOG.debug("batching message:" + message);
 					out.writeUTF(message);
 					LOG.debug("batching message sent");

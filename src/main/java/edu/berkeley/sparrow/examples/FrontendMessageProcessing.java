@@ -88,8 +88,8 @@ public class FrontendMessageProcessing implements Runnable{
 					if (in.available() > 0){
 						LOG.debug("Message Handler - available > 0");
 						String tasksCompletedBatch = in.readUTF();
-						System.out.println("RECEPTION MESSAGE : " + tasksCompletedBatch + " time " + System.nanoTime());
-						long receptionTime = System.nanoTime();
+						System.out.println("RECEPTION MESSAGE : " + tasksCompletedBatch + " time " + System.currentTimeMillis());
+						long receptionTime = System.currentTimeMillis();
 						addMessage(receptionTime, tasksCompletedBatch);
 					}else{
 						LOG.debug("Message Handler - available = 0");

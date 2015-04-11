@@ -116,7 +116,7 @@ public class BBackend implements BackendService.Iface {
 			while (true) {
 				try {
 					TFullTaskId task = finishedTasks.take();
-					long endTime = System.nanoTime();
+					long endTime = System.currentTimeMillis();
 					Batching.add(Integer.parseInt(task.taskId), endTime);
 					client.tasksFinished(Lists.newArrayList(task));
 				} catch (InterruptedException e) {
@@ -145,14 +145,14 @@ public class BBackend implements BackendService.Iface {
 
 		@Override
 		public void run() {
-			long startTime = System.nanoTime();
+			long startTime = System.currentTimeMillis();
 			try {
 				Thread.sleep(taskDurationMillis);
 			} catch (InterruptedException e) {
 				LOG.error("Interrupted while sleeping: " + e.getMessage());
 			}
-			long endTime = System.nanoTime();
-			LOG.debug("Task completed in " + (endTime - startTime)/1000000 + "ms");
+			long endTime = System.currentTimeMillis();
+			LOG.debug("Task completed in " + (endTime - startTime) + "ms");
 			resultLog.write(taskId.taskId, endTime - startTime, "running", ipAddress);
 			finishedTasks.add(taskId);
 		}

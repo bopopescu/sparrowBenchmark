@@ -97,7 +97,7 @@ public class TaskLauncherService {
         task.taskSpec = taskLaunchSpecs.get(0);
         LOG.debug("Received task for request " + task.requestId + ", task " +
                   task.taskSpec.getTaskId());
-        resultLog.write(task.taskSpec.getTaskId(), System.nanoTime(), "Received", scheduler.ipAddress ); //XXX
+        resultLog.write(task.taskSpec.getTaskId(), System.currentTimeMillis(), "Received", scheduler.ipAddress ); //XXX
 
         // Launch the task on the backend.
         AUDIT_LOG.info(Logging.auditEventString("node_monitor_task_launch",
@@ -109,7 +109,7 @@ public class TaskLauncherService {
         executeLaunchTaskRpc(task);
         LOG.debug("Launched task " + task.taskSpec.getTaskId() + " for request " + task.requestId +
             " on application backend at system time " + System.currentTimeMillis()); 
-        resultLog.write(task.taskSpec.getTaskId(), System.nanoTime(), "Launched", scheduler.ipAddress ); //XXX
+        resultLog.write(task.taskSpec.getTaskId(), System.currentTimeMillis(), "Launched", scheduler.ipAddress ); //XXX
       }
 
     }

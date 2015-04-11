@@ -128,8 +128,8 @@ public abstract class TaskScheduler {
   protected void makeTaskRunnable(TaskSpec task) {
     try {
       LOG.debug("Putting reservation for request " + task.requestId + " in runnable queue");
-      LOG.debug( System.nanoTime() + " " + ipAddress);
-      //resultLog.write(task.requestId, System.nanoTime(), "Put", ipAddress ); //XXX 
+      LOG.debug( System.currentTimeMillis() + " " + ipAddress);
+      //resultLog.write(task.requestId, System.currentTimeMillis(), "Put", ipAddress ); //XXX 
       runnableTaskQueue.put(task);
     } catch (InterruptedException e) {
       LOG.fatal("Unable to add task to runnable queue: " + e.getMessage());

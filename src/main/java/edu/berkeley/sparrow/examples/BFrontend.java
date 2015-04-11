@@ -98,14 +98,14 @@ public class BFrontend implements FrontendService.Iface {
 				spec.setMessage(message.array());
 				tasks.add(spec);
 			}
-			startTime = System.nanoTime();
+			startTime = System.currentTimeMillis();
 			try {
 				client.submitJob(APPLICATION_ID, tasks, USER);
 			} catch (TException e) {
 				LOG.error("Scheduling request failed!", e);
 			}
-			long end = System.nanoTime();
-			LOG.debug("Scheduling request duration " + (end - startTime)/1000000 + "ms");
+			long end = System.currentTimeMillis();
+			LOG.debug("Scheduling request duration " + (end - startTime) + "ms");
 		}
 
 	}
@@ -158,12 +158,12 @@ public class BFrontend implements FrontendService.Iface {
 
 			JobLaunchRunnable runnable = new JobLaunchRunnable(numberTasks, taskDurationMillis);
 			Thread jobLaunch = new Thread(runnable);
-			long startTime = System.nanoTime();
+			long startTime = System.currentTimeMillis();
 			jobLaunch.start();
 
 			LOG.debug("sleeping");
-			long maxEndTime = startTime + experimentDurationS * 1000000000;
-			while (tasksCompleted < numberTasks && System.nanoTime() < maxEndTime ) {
+			long maxEndTime = startTime + experimentDurationS * 1000;
+			while (tasksCompleted < numberTasks && System.currentTimeMillis() < maxEndTime ) {
 				LOG.debug("Tasks completed = "+ tasksCompleted);
 				Thread.sleep(500);
 			}
@@ -176,7 +176,7 @@ public class BFrontend implements FrontendService.Iface {
 			if(endTime < maxEndTime || tasksCompleted == numberTasks){
 				long expTime = endTime - startTime;
 				LOG.debug("Tasks completed = "+ tasksCompleted);
-				LOG.debug("Experiment ended  in " + (expTime/1000000) + "ms");
+				LOG.debug("Experiment ended  in " + (expTime) + "ms");
 				bw.write("0," + "Experiment full time" + "," + expTime + "," + ip + "," + Thread.currentThread().getId() + "\n");
 			}else{
 				LOG.debug("Experiment ended - Timeout");
@@ -189,7 +189,7 @@ public class BFrontend implements FrontendService.Iface {
 			jobLaunch.join();
 			long[] endTimes = messageProcessing.getEndTimes();
 			for(int i = 0; i < endTimes.length; i++ ){
-				LOG.debug("Sleep "+ i + " "+ (endTimes[i] - startTime)/1000000 + "ms");
+				LOG.debug("Sleep "+ i + " "+ (endTimes[i] - startTime) + "ms");
 				bw.write((i+1) + "," + "Full time" + "," + (endTimes[i] - startTime) + "," + ip + "," + Thread.currentThread().getId() + "\n");
 				
 			}
