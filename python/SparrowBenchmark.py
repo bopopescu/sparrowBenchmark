@@ -58,7 +58,7 @@ for benchmark in benchmarks:
             
     backendConfs.pop(0)
     #List of IPs update/set
-      #update already operational workers -add "privateIps"
+      #update already operational workers -add "privateIps" + frontend instance
     SparrowSSH.updateClientConfigIps(privateIps, workerIps)
     SparrowConfigC.addIps(privateIps)
       #update the total list of ips
@@ -71,12 +71,13 @@ for benchmark in benchmarks:
     
     #raw_input("worker conf set")
     #Launch worker/client on instance
+    subprocess.call(shlex.split("python SparrowLocal.py -l all -nw " + str(benchmark[1]))
     for ip in workerIps:
         SparrowSSH.startWorker(ip, benchmark[1])        
 
     print "30s delay for start ups"
     time.sleep(30)
-    raw_input("worker launched\n")
+    raw_input("worker launched press enter\n")
     #subprocess.call(shlex.split("python SparrowLocal.py -r"))
     #subprocess.call(shlex.split("python SparrowLocal.py -l client"))
     sparrowFrontend = subprocess.Popen(shlex.split(commandFrontend+str(benchmark[0])))
@@ -96,7 +97,8 @@ for benchmark in benchmarks:
     raw_input("exp end, press enter")
     resultsFp = open("../Results.txt", "a")
         
-    #Kill worker/client on instance
+    #Kill worker/client on instances
+    
     for ip in workerIps:
         SparrowSSH.killWorker(ip)
         #fetch all results
