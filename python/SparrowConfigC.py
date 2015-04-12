@@ -53,4 +53,4 @@ if __name__ == "__main__":
     if args.mode == "set":
         setIps(args.IPs)
     else:
-        addIPs(args.IPs)
+        addIps(args.IPs)
