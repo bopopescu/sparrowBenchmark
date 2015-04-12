@@ -92,7 +92,7 @@ public class FrontendMessageProcessing implements Runnable{
 						long receptionTime = System.currentTimeMillis();
 						addMessage(receptionTime, tasksCompletedBatch);
 					}else{
-						LOG.debug("Message Handler - available = 0");
+						//LOG.debug("Message Handler - available = 0");
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
