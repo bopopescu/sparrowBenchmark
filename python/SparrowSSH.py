@@ -49,7 +49,9 @@ def setClientConfigIps(ipsToStore, workerIps):
         client.connect(ip, username="ubuntu",allow_agent=False, key_filename = "matrix.pem")
 
         stdin, stdout, stderr = client.exec_command(setIPCommand + " ".join(tuple(ipsToStore)))
-            
+        print stdout.read()
+        print stderr.read()
+    
         client.close()
     
 def updateClientConfigIps(additionalIps, workerIps):
@@ -59,14 +61,14 @@ def updateClientConfigIps(additionalIps, workerIps):
         client.connect(ip, username="ubuntu",allow_agent=False, key_filename = "matrix.pem")
 
         stdin, stdout, stderr = client.exec_command(updateIPCommand + " ".join(tuple(additionalIps)))
-
+       
         client.close()
     
 if __name__ == "__main__":
 
-    ip = "52.11.154.179"
-    fp = open("testResults.txt", "a")
-    grabResults(fp,ip)    
+    ip = "54.148.243.154"
+    setClientConfigIps(["1.1.1.1", u'52.11.116.188', "2.2.2.2"], [ip])
+  
 #    client = paramiko.SSHClient()
 #    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 #    client.connect("52.11.154.179", username="ubuntu",allow_agent=False, key_filename = "matrix.pem")
