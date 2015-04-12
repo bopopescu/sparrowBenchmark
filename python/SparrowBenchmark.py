@@ -86,6 +86,7 @@ for benchmark in benchmarks:
     
     os.chdir("/home/ubuntu/sparrow/python")
     startTime = time.time()
+    run = True
     while run and time.time() - startTime < 300:
         #wait for front end to finish
         time.sleep(5)
