@@ -60,6 +60,8 @@ public class BFrontend implements FrontendService.Iface {
 	public static final String APPLICATION_ID = "Bsleep";
 
 	private static final Logger LOG = Logger.getLogger(BFrontend.class);
+	private static final String DEFAULT_LOG_LEVEL = "debug";
+	private static final String LOG_LEVEL = "log_level";
 
 	private static final TUserGroupInfo USER = new TUserGroupInfo();
 
@@ -124,7 +126,6 @@ public class BFrontend implements FrontendService.Iface {
 
 			// Logger configuration: log to the console
 			BasicConfigurator.configure();
-			LOG.setLevel(Level.DEBUG);
 
 			Configuration conf = new PropertiesConfiguration();
 
@@ -136,7 +137,7 @@ public class BFrontend implements FrontendService.Iface {
 			int experimentDurationS = conf.getInt(EXPERIMENT_S, DEFAULT_EXPERIMENT_S);
 			int numberTasks = conf.getInt(NUMBER_TASKS, DEFAULT_NUMBER_TASKS);
 			int taskDurationMillis = conf.getInt(TASK_DURATION_MILLIS, DEFAULT_TASK_DURATION_MILLIS);
-
+			LOG.setLevel(Level.toLevel(conf.getString(LOG_LEVEL, DEFAULT_LOG_LEVEL)));
 			int schedulerPort = conf.getInt(SCHEDULER_PORT,
 					SchedulerThrift.DEFAULT_SCHEDULER_THRIFT_PORT);
 			String schedulerHost = conf.getString(SCHEDULER_HOST, DEFAULT_SCHEDULER_HOST);
