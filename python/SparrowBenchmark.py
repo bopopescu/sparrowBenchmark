@@ -64,14 +64,16 @@ for benchmark in benchmarks:
       #update the total list of ips
     workerPrivateIps += privateIps
     workerIps += ips
-    
+    print "workerPrivateIps = " + str(workerPrivateIps)
       #set conf file of new workers
+    print str(workerPrivateIps) + " " + str(ips)
     os.chdir("/home/ubuntu/sparrow/python")
     SparrowSSH.setClientConfigIps(workerPrivateIps, ips)
-    
+    raw_input("config pushed, press enter")    
     #raw_input("worker conf set")
     #Launch worker/client on instance
     subprocess.call(shlex.split("python SparrowLocal.py -l all -nw " + str(benchmark[1])))
+    raw_input("press enter to update instance config")
     for ip in workerIps:
         SparrowSSH.startWorker(ip, benchmark[1])        
 
