@@ -73,7 +73,6 @@ for benchmark in benchmarks:
     #raw_input("worker conf set")
     #Launch worker/client on instance
     subprocess.call(shlex.split("python SparrowLocal.py -l all -nw " + str(benchmark[1])))
-    raw_input("press enter to update instance config")
     for ip in workerIps:
         SparrowSSH.startWorker(ip, benchmark[1])        
 
@@ -110,7 +109,7 @@ for benchmark in benchmarks:
     resultsFp.close()
     
     sparrowFrontend.kill()
-
+    subprocess.call(shlex.split("python SparrowLocal.py -k all"))
 print "End of Benchmarking"
 
 #instanceLauncher.terminateAll()    
