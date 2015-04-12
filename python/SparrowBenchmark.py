@@ -7,7 +7,7 @@ import os, shlex, SparrowDistant, SparrowConfigC, SparrowSSH, string, subprocess
 import time
 
 commandFrontend = "java -cp ../target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.examples.BFrontend -c ../Conf/conf.Frontend"
-frontendPrivateIp = "192.168.1.196"
+frontendPrivateIp = "172.31.22.75"
 benchmarks = [[1,1,1]]
 benchmarks = sorted(benchmarks, key=lambda benchmark: benchmark[2])
 workerPrivateIps = [frontendPrivateIp]
@@ -71,7 +71,7 @@ for benchmark in benchmarks:
     
     #raw_input("worker conf set")
     #Launch worker/client on instance
-    subprocess.call(shlex.split("python SparrowLocal.py -l all -nw " + str(benchmark[1]))
+    subprocess.call(shlex.split("python SparrowLocal.py -l all -nw " + str(benchmark[1])))
     for ip in workerIps:
         SparrowSSH.startWorker(ip, benchmark[1])        
 
@@ -105,6 +105,10 @@ for benchmark in benchmarks:
         SparrowSSH.grabResults(resultsFp, ip)
         
     resultsFp.close()
+    
+    sparrowFrontend.kill()
 
-instanceLauncher.terminateAll()    
+print "End of Benchmarking"
+
+#instanceLauncher.terminateAll()    
 
