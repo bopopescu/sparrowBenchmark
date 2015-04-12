@@ -221,6 +221,7 @@ public class BFrontend implements FrontendService.Iface {
 			e.printStackTrace();
 		}
 		LOG.debug("BFronted exit complete");
+		System.out.println("BFronted exit complete");
 		
 		return;
 
