@@ -50,7 +50,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args() 
     
-    if args.mode == "set":
+    if args.mode[0] == "set":
         setIps(args.IPs)
     else:
         addIps(args.IPs)
