@@ -121,7 +121,7 @@ public class FrontendMessageProcessing implements Runnable{
 
 	@Override
 	public void run() {
-		long lastBatchRecpTime;
+		//long lastBatchRecpTime;
 
 
 		LOG.debug("FeMessageProcessing - started");
@@ -139,7 +139,7 @@ public class FrontendMessageProcessing implements Runnable{
 				}
 			}else{
 				LOG.debug("FeMessageProcessing - reception");
-				lastBatchRecpTime = 0;
+				//lastBatchRecpTime = 0;
 				TimeMessage timeMessage = fifo.poll();
 				lastReceptionTime = timeMessage.receptionTime;
 				LOG.debug("receptTime="+ timeMessage.receptionTime + " message="+ timeMessage.message);
@@ -159,7 +159,7 @@ public class FrontendMessageProcessing implements Runnable{
 							LOG.error("FeMessageProcessing - Message format received not int:long");
 
 						}else if(taskId == 0){ // reception of the batching delay. All tasks in the batch are subtracted the duration of the batching
-							lastBatchRecpTime = delay;
+							//lastBatchRecpTime = delay;
 							for(int i : taskIds){
 								endTimes[i] = endTimes[i] - delay; 
 								BFrontend.taskCompleted();
@@ -168,7 +168,7 @@ public class FrontendMessageProcessing implements Runnable{
 
 						}else if(taskId <= endTimes.length){
 							taskIds.add(taskId-1);
-							endTimes[taskId-1] = timeMessage.receptionTime + lastBatchRecpTime + delay;  //in case 2 batchs are in a single message
+							endTimes[taskId-1] = timeMessage.receptionTime + delay;  // + lastBatchRecpTime in case 2 batchs are in a single message
 
 						}else{
 							LOG.error("FeMessageProcessing - Received incorrect task Id");
