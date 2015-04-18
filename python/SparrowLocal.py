@@ -83,3 +83,5 @@ if __name__ == "__main__":
     if args.launch != None:
         launch(args.launch, args.numberworker)
     
+    return 0
+    
