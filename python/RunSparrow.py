@@ -1,7 +1,7 @@
 import subprocess, os, shlex, time, sys
 
 os.chdir("/home/ubuntu/sparrow-master/python")
-subprocess.call(shlex.split("echo \"\" > Finish.txt"), shell = True)
+subprocess.call("echo \"\" > Finish.txt", shell = True)
 commandFrontend = "java -cp ../target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.examples.BFrontend -c ../Conf/conf.Frontend1"
 
 startTime = time.time()
