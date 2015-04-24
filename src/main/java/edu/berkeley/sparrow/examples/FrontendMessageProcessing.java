@@ -1,5 +1,6 @@
 package edu.berkeley.sparrow.examples;
 
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -17,8 +18,10 @@ public class FrontendMessageProcessing implements Runnable{
 
 	private ConcurrentLinkedQueue<TimeMessage> fifo = new ConcurrentLinkedQueue<FrontendMessageProcessing.TimeMessage>();
 	private boolean run = true;
-	private long[] endTimes;
+	//private long[] endTimes;
 	private Logger LOG;
+	private BufferedWriter bw;
+	private long startTime;
 	private ServerSocket serverSocket;
 	private Thread[] receptionThreads = new Thread[124];
 	private String messageSeparator = ";";
@@ -28,10 +31,13 @@ public class FrontendMessageProcessing implements Runnable{
 	private ArrayList<Integer> taskIds = new ArrayList<Integer>();
 	public long lastReceptionTime;
 	
-	public FrontendMessageProcessing(int numberOfTasks, Logger log, ServerSocket serverSocket) {
-		this.endTimes = new long[numberOfTasks];
+	public FrontendMessageProcessing(//int numberOfTasks,
+			Logger log, ServerSocket serverSocket, BufferedWriter bw, long startTime) {
+		//this.endTimes = new long[numberOfTasks];
 		this.LOG = log;
 		this.serverSocket = serverSocket;
+		this.bw = bw;
+		this.startTime = startTime;
 	}
 
 
@@ -138,6 +144,8 @@ public class FrontendMessageProcessing implements Runnable{
 					e.printStackTrace();
 				}
 			}else{
+				//XXX
+				int idx = 0;
 				LOG.debug("FeMessageProcessing - reception");
 				//lastBatchRecpTime = 0;
 				TimeMessage timeMessage = fifo.poll();
@@ -146,6 +154,7 @@ public class FrontendMessageProcessing implements Runnable{
 				// 2 splitting. 1 to get (ID, delay) messages, then extract Id & delay
 				String[] messageSplit = pattern1.split(timeMessage.message);
 				//				LOG.debug("messagesplit1=" + messageSplit);
+				long[] endTimes = new long[messageSplit.length]; // XXX redefinition of endTimes 
 				for(String unitMessage : messageSplit){
 					String[] info = pattern2.split(unitMessage);
 					//					LOG.debug("messagesplit2=" + info);
@@ -160,20 +169,35 @@ public class FrontendMessageProcessing implements Runnable{
 
 						}else if(taskId == 0){ // reception of the batching delay. All tasks in the batch are subtracted the duration of the batching
 							//lastBatchRecpTime = delay;
-							for(int i : taskIds){
-								endTimes[i] = endTimes[i] - delay; 
+							for(int i = 0; i< endTimes.length - 1; i++){
+								endTimes[i] = endTimes[i] - delay;
+								LOG.debug("Sleep "+ taskIds.get(i) + " "+ (endTimes[i] - startTime) + "ms");
+								try {
+									bw.write(taskIds.get(i) + "," + "Full time" + "," + (endTimes[i] - startTime) + "," + "," + Thread.currentThread().getId() + "\n");
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								BFrontend.taskCompleted();
 							}
 							taskIds.clear(); //clear list for next batch
 
 						}else if(taskId <= endTimes.length){
 							taskIds.add(taskId-1);
-							endTimes[taskId-1] = timeMessage.receptionTime + delay;  // + lastBatchRecpTime in case 2 batchs are in a single message
+							endTimes[idx] = timeMessage.receptionTime + delay;  // + lastBatchRecpTime in case 2 batchs are in a single message
+							
+							idx ++;
 
 						}else{
 							LOG.error("FeMessageProcessing - Received incorrect task Id");
 						}
 					}
+				}
+				try {
+					bw.flush();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}
@@ -203,8 +227,8 @@ public class FrontendMessageProcessing implements Runnable{
 		LOG.debug("FeMessageProcessing - exit complete");
 	}
 
-	public long[] getEndTimes() {
-		return endTimes;
-	}
+//	public long[] getEndTimes() {
+//		return endTimes;
+//	}
 
 }

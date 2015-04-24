@@ -148,10 +148,13 @@ public class BFrontend implements FrontendService.Iface {
 
 			client = new SparrowFrontendClient();
 			client.initialize(new InetSocketAddress(schedulerHost, schedulerPort), APPLICATION_ID, this);
-
+			FileWriter fw = new FileWriter("Results.txt");
+			BufferedWriter bw = new BufferedWriter(fw);
 			LOG.debug("Client initilized");
 
-			FrontendMessageProcessing messageProcessing = new FrontendMessageProcessing(numberTasks, LOG, serverSocket);
+			long startTime = System.currentTimeMillis();
+			FrontendMessageProcessing messageProcessing = new FrontendMessageProcessing(//numberTasks, 
+					LOG, serverSocket, bw, startTime);
 			Thread messageProcessingTh = new Thread(messageProcessing);
 			messageProcessingTh.start();
 
@@ -159,7 +162,6 @@ public class BFrontend implements FrontendService.Iface {
 
 			JobLaunchRunnable runnable = new JobLaunchRunnable(numberTasks, taskDurationMillis);
 			Thread jobLaunch = new Thread(runnable);
-			long startTime = System.currentTimeMillis();
 			jobLaunch.start();
 
 			LOG.debug("sleeping");
@@ -169,10 +171,13 @@ public class BFrontend implements FrontendService.Iface {
 				Thread.sleep(500);
 			}
 			long endTime = messageProcessing.lastReceptionTime;
+			serverSocket.close();
+			messageProcessing.stop();
+			messageProcessingTh.join();
+			jobLaunch.join();
 			
 			LOG.debug("task completed " + tasksCompleted + " start " + startTime + " end " + endTime + " maxend " + maxEndTime);
-			FileWriter fw = new FileWriter("Results.txt");
-			BufferedWriter bw = new BufferedWriter(fw);
+
 			String ip = InetAddress.getLocalHost().toString();
 			if(endTime < maxEndTime || tasksCompleted == numberTasks){
 				long expTime = endTime - startTime;
@@ -184,22 +189,20 @@ public class BFrontend implements FrontendService.Iface {
 			}
 
 			//long[] endTimes = messageProcessing.getEndTimes();
-			serverSocket.close();
-			messageProcessing.stop();
-			messageProcessingTh.join();
-			jobLaunch.join();
+
+			//XXX
+			/*
 			long[] endTimes = messageProcessing.getEndTimes();
 			for(int i = 0; i < endTimes.length; i++ ){
 				LOG.debug("Sleep "+ i + " "+ (endTimes[i] - startTime) + "ms");
 				bw.write((i+1) + "," + "Full time" + "," + (endTimes[i] - startTime) + "," + ip + "," + Thread.currentThread().getId() + "\n");
 				
-			}
+			}*/
 			bw.flush();
 			bw.close();
 			fw.flush();
 			fw.close();
-			
-			LOG.debug(endTimes[0] + " "+ endTime + " " + (endTime - endTimes[0]));
+			//XXX
 			client.close();
 
 		}
@@ -211,11 +214,9 @@ public class BFrontend implements FrontendService.Iface {
 		try {
 			fw = new FileWriter("Finish.txt");
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write("Experience finished");
+			bw.write("Experience finished\n");
 			bw.flush();
 			bw.close();
-			fw.flush();
-			fw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
