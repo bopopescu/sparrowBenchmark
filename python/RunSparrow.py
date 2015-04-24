@@ -1,4 +1,4 @@
-import subprocess, os, shlex, time
+import subprocess, os, shlex, time, sys
 
 os.chdir("/home/ubuntu/sparrow-master/python")
 subprocess.call(shlex.split("echo \"\" > Finish.txt"), shell = True)
@@ -21,6 +21,6 @@ sparrowFrontend.kill()
 print "Experience ended?" + str(not(run))
 
 if run:
-    return 1
+    sys.exit(1)
 else:
-    return 0
+    sys.exit(0)
