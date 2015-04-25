@@ -1,10 +1,11 @@
 import subprocess, os, shlex, time, sys
 
-os.chdir("/home/ubuntu/sparrow-master/python")
+os.chdir("/home/ubuntu/sparrow/python")
 subprocess.call("echo \"\" > Finish.txt", shell = True)
 commandFrontend = "java -cp ../target/sparrow-1.0-SNAPSHOT.jar edu.berkeley.sparrow.examples.BFrontend -c ../Conf/conf.Frontend1"
 
 startTime = time.time()
+sparrowFrontend = subprocess.Popen(shlex.split(commandFrontend))
 run = True
 while run and time.time() - startTime < 600:
     #wait for front end to finish
