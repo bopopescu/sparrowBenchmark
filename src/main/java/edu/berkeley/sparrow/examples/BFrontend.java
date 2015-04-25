@@ -154,7 +154,7 @@ public class BFrontend implements FrontendService.Iface {
 
 			long startTime = System.currentTimeMillis();
 			FrontendMessageProcessing messageProcessing = new FrontendMessageProcessing(//numberTasks, 
-					LOG, serverSocket, bw, startTime);
+					LOG, serverSocket, bw, startTime, numberTasks);
 			Thread messageProcessingTh = new Thread(messageProcessing);
 			messageProcessingTh.start();
 

@@ -30,14 +30,16 @@ public class FrontendMessageProcessing implements Runnable{
 	private Pattern pattern2 = Pattern.compile(idEndTimeSeparator);
 	private ArrayList<Integer> taskIds = new ArrayList<Integer>();
 	public long lastReceptionTime;
+	private int numberOfTasks;
 	
 	public FrontendMessageProcessing(//int numberOfTasks,
-			Logger log, ServerSocket serverSocket, BufferedWriter bw, long startTime) {
+			Logger log, ServerSocket serverSocket, BufferedWriter bw, long startTime, int numberOfTasks) {
 		//this.endTimes = new long[numberOfTasks];
 		this.LOG = log;
 		this.serverSocket = serverSocket;
 		this.bw = bw;
 		this.startTime = startTime;
+		this.numberOfTasks = numberOfTasks;
 	}
 
 
@@ -182,7 +184,7 @@ public class FrontendMessageProcessing implements Runnable{
 							}
 							taskIds.clear(); //clear list for next batch
 
-						}else if(taskId <= endTimes.length){
+						}else if(taskId <= numberOfTasks){
 							taskIds.add(taskId-1);
 							endTimes[idx] = timeMessage.receptionTime + delay;  // + lastBatchRecpTime in case 2 batchs are in a single message
 							
