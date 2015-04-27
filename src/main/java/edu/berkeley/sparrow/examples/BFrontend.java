@@ -93,14 +93,28 @@ public class BFrontend implements FrontendService.Iface {
 			ByteBuffer message = ByteBuffer.allocate(4);
 			message.putInt(taskDurationMillis);
 
+			startTime = System.currentTimeMillis();
 			List<TTaskSpec> tasks = new ArrayList<TTaskSpec>();
-			for (int taskId = 1; taskId <= NumberTasks; taskId++) {
-				TTaskSpec spec = new TTaskSpec();
+			int taskId = 1;
+			int batch = 0;
+			TTaskSpec spec = new TTaskSpec();
+			while(taskId <= NumberTasks){
 				spec.setTaskId(Integer.toString(taskId));
 				spec.setMessage(message.array());
 				tasks.add(spec);
+				taskId++;
+				batch++;
+				if(batch >= 10000){
+					try {
+						client.submitJob(APPLICATION_ID, tasks, USER);
+					} catch (TException e) {
+						LOG.error("Scheduling request failed!", e);
+					}
+					spec = new TTaskSpec();
+					batch = 0;
+				}
 			}
-			startTime = System.currentTimeMillis();
+
 			try {
 				client.submitJob(APPLICATION_ID, tasks, USER);
 			} catch (TException e) {
