@@ -1,3 +1,5 @@
+Custom version of Sparrow for benchmarking purposes. Following is the original Sparrow README
+
 Sparrow Scheduler
 ================================
 Sparrow is a high throughput, low latency, and fault-tolerant distributed cluster scheduler. Sparrow is designed for applications that require resource allocations frequently for very short jobs, such as analytics frameworks. Sparrow schedules from a distributed set of schedulers that maintain no shared state. Instead, to schedule a job, a scheduler obtains intantaneous load information by sending probes to a subset of worker machines. The scheduler places the job's tasks on the least loaded of the probed workers. This technique allows Sparrow to schedule in milliseconds, two orders of magnitude faster than existing approaches. Sparrow also handles failures: if a scheduler fails, a client simply directs scheduling requests to an alternate scheduler.
