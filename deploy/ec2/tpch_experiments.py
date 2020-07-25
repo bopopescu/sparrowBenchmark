@@ -28,7 +28,7 @@ rates = [310]
 backend_mem = "5g"
 cluster_name = "tpch"
 sparrow_branch = "per_task_old_code"
-#sparrow_branch = "master"
+#sparrow_branch = "main"
 key_loc = "patkey.pem"
 
 def run_cmd(cmd):

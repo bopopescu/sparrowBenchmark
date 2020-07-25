@@ -82,7 +82,7 @@ class Task:
         # When the node monitor asked for the task from the scheduler.
         self.node_monitor_get_task_time = INVALID_TIME
 
-        # When the scheduler (resident with the frontend) assigned the task to the slave.
+        # When the scheduler (resident with the frontend) assigned the task to the subordinate.
         self.scheduler_launch_time = INVALID_TIME
         # When the node monitor (resident with the backend) launched the task
         self.node_monitor_launch_time = INVALID_TIME

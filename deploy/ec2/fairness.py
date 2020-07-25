@@ -38,7 +38,7 @@ def main(argv):
     task_duration_ms = 100
     tasks_per_job = 3
     private_ssh_key = "patkey.pem"
-    sparrow_branch = "master"
+    sparrow_branch = "main"
     num_backends = 100
     num_frontends = 10
     cores_per_backend = 4
